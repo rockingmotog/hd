@@ -35,3 +35,5 @@ recordRoutes.route('/record').get(function (req, res) {
             res.json(result)
         });
 });
+
+module.exports = recordRoutes;
