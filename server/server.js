@@ -28,41 +28,21 @@ mongoose.connect(dbUri, { useUnifiedTopology: true, useNewUrlParser: true })
 // Validate the if the user details already exists & Register the user 
 
 
-app.post('/register', async (req, res) => {
-    const user = req.body;
 
-    const givenUsername = await User.findOne({ username: user.username })
-    const takenEmail = await User.findOne({ email: user.email })
+app.get('/', async (req, res) => {
 
-    if (givenUsername || takenEmail) {
-        console.log('Username or Email alredy taken by someone else')
-    } else {
-        user.password = await bcrypt.hash(req.body.password, 10);
-        const dbUser = new User({
-            username: user.username.toLowerCase(),
-            email: user.email.toLowerCase(),
-            password: user.password
-        })
-        dbUser.save();
-        res.json({ message: "Success !! " })
-    }
+    res.send('Welcome to Home Page !!!')
+    console.log('GET Method Invoked')
 
 })
 
-app.post('/login', async (req, res) => {
-    const userLogin = req.body;
-    User.findOne({ username: userLogin.username })
-        .then(dbUser => {
-            if (!dbUser) {
-                return res.json({
-                    message: "Invaild Username & Password"
-                })
-            }
-            bcrypt.compare(userLogin.password, dbUser.password)
-            .then(isCorrect){ 
-                const payload = 
-            }
-        })
+app.post('/register', async (req, res) => {
+    
+    const body = req.body;
+    console.log(body.username, body.password)
 
-}
-)
+    const userProvidedName = await User.findOne({ username: body.username })
+    const userProvidedEmail = await User.findOne({ email: body.emailid })
+    
+
+})
