@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('./models/user');
 const mongoose = require('mongoose');
+const { response } = require('express');
 require('dotenv').config({ path: './config.env' });
 
 const port = process.env.SERVERPORT || 5000;
@@ -37,12 +38,58 @@ app.get('/', async (req, res) => {
 })
 
 app.post('/register', async (req, res) => {
-    
-    const body = req.body;
-    console.log(body.username, body.password)
 
-    const userProvidedName = await User.findOne({ username: body.username })
-    const userProvidedEmail = await User.findOne({ email: body.emailid })
-    
+    const userdetails = req.body;
+    console.log(userdetails.username, userdetails.emailid, userdetails.password)
 
+    // Verify if the username and emailid already used for registeration
+    const userProvidedName = await User.findOne({ username: userdetails.username })
+    const userProvidedEmail = await User.findOne({ emailid: userdetails.emailid })
+
+
+    if (userProvidedName || userProvidedEmail) {
+        res.json({ message: "UserName or Email Id aleady used by some one else" })
+    } else {
+        userdetails.password = await bcrypt.hash(req.body.password, 10)
+        const dbUser = new User({ username: userdetails.username.toLowerCase(), emailid: userdetails.emailid.toLowerCase(), password: userdetails.password })
+        dbUser.save()
+        res.json({ message: "success" })
+    }
+
+
+
+})
+
+app.post('/login', async (req, res) => {
+    const userLoginDetails = req.body;
+    console.log(userLoginDetails.username, userLoginDetails.emaillid, userLoginDetails.password)
+    User.findOne({ username: userLoginDetails.username })
+        .then(dbUser => {
+            if (!dbUser) { return res.json({ message: "Invalid Username & Password" }) }
+            bcrypt.compare(userLoginDetails.password, dbUser.password)
+                .then(isCorrect => {
+                    if (isCorrect) {
+                        const payload = {
+                            id: dbUser._id,
+                            username: dbUser.username
+                        }
+                        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 86400 },
+                            (err, token) => {
+                                if (err) return res.json({ message: err })
+                                return res.json({
+                                    message: "Success",
+                                    token: "Bearer" + token
+                                })
+
+                            })
+
+                    } else {
+                        return res.json({
+                            message: "Invalid Username or Password"
+                        })
+                    }
+
+
+                })
+        })
 })
