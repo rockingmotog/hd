@@ -8,32 +8,9 @@ const ObjectId = require('mongodb').ObjectId;
 
 
 // get record by id
-recordRoutes.route('/record/:id').get(function (req, res) {
-    let db_connect = dbo.getDb("employees");
-    let myquery = { _id: ObjectId(req.params.id) };
-
-    db_connect
-        .collection('records')
-        .findOne(myquery, function (err, result) {
-            if (err) throw err;
-            res.json(result)
-        });
-
-});
 
 
 
-// get all records
-recordRoutes.route('/record').get(function (req, res) {
-    let db_connect = dbo.getDb("employees");
-    let myquery = { _id: ObjectId(req.params.id) };
-    db_connect
-        .collection('records')
-        .find({})
-        .toArray(function (err, result) {
-            if (err) throw err;
-            res.json(result)
-        });
-});
 
-module.exports = recordRoutes;
+
+module.exports = Routes;

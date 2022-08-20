@@ -5,9 +5,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('./models/user');
 const mongoose = require('mongoose');
-const { response } = require('express');
-require('dotenv').config({ path: './config.env' });
+const awsmailer = require('sendmail')
 
+
+require('dotenv').config({ path: './config.env' });
 const port = process.env.SERVERPORT || 5000;
 const dbUri = process.env.ATLAS_URI;
 
@@ -18,6 +19,8 @@ app.use(bodyParser.json(), urlencodedParser)
 app.use(express.json());
 app.use(cors());
 
+// connect to the database and server starts listening
+
 mongoose.connect(dbUri, { useUnifiedTopology: true, useNewUrlParser: true })
     .then(res => {
         app.listen(port, () => {
@@ -25,8 +28,6 @@ mongoose.connect(dbUri, { useUnifiedTopology: true, useNewUrlParser: true })
         })
     })
     .catch(err => { console.log(err) })
-
-// Validate the if the user details already exists & Register the user 
 
 
 
@@ -55,6 +56,9 @@ app.post('/register', async (req, res) => {
         dbUser.save()
         res.json({ message: "success" })
     }
+
+    var fdCode = Math.floor(1000 + Math.random() * 9000);
+
 
 
 
