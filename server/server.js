@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('./models/user');
 const mongoose = require('mongoose');
-const awsmailer = require('sendmail')
+const awsses = require('./emailer')
 
 
 require('dotenv').config({ path: './config.env' });
@@ -38,6 +38,7 @@ app.get('/', async (req, res) => {
 
 })
 
+
 app.post('/register', async (req, res) => {
 
     const userdetails = req.body;
@@ -54,14 +55,24 @@ app.post('/register', async (req, res) => {
         userdetails.password = await bcrypt.hash(req.body.password, 10)
         const dbUser = new User({ username: userdetails.username.toLowerCase(), emailid: userdetails.emailid.toLowerCase(), password: userdetails.password })
         dbUser.save()
+
+        // Verify if the username and emailid already used for registeration
+
+        global.fdCode = Math.floor(1000 + Math.random() * 9000);
+        awsses.email('no-reply@haradata.org', userProvidedEmail, fdCode)
         res.json({ message: "success" })
+
     }
-
-    var fdCode = Math.floor(1000 + Math.random() * 9000);
-
+})
 
 
+app.verify('/verify', async (req, res) => {
 
+    const udCode = req.code;
+    if (udCode == fdCode) {
+        console.log('Your email-id has been succefully validated !!! ')
+        res.json({ message: 'success' })
+    }
 })
 
 app.post('/login', async (req, res) => {

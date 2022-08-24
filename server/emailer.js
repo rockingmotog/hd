@@ -1,5 +1,6 @@
 const awssdk = require('aws-sdk');
-AWS.config.udpate({ region: 'us-east-1' });
+
+awssdk.config.udpate({ region: 'us-east-1' });
 
 module.exports.email = function (senderEmailId, userEmailId, fdCode) {
     var params = {
